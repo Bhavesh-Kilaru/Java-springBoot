@@ -2,6 +2,9 @@ package com.demo.cachingservice.controller;
 
 import java.util.List;
 
+import com.demo.cachingservice.model.PersonEntity;
+import com.demo.cachingservice.repository.PersonEntityRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.cachingservice.model.PersonEntity;
-import com.demo.cachingservice.repository.PersonEntityRepository;
-
 import com.demo.cachingservice.service.InMemoryCacheService;
 
 @RestController
@@ -25,32 +25,13 @@ public class CacheController {
 	private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
 
     private final InMemoryCacheService cacheService;
-
+    @Autowired
     // Constructor injection in controller
-    public CacheController() {
-        this.cacheService = new InMemoryCacheService(2); // Default max size = 2
+    public CacheController(InMemoryCacheService cacheService) {
+        this.cacheService = cacheService;
     }
-    
-//    @GetMapping("/initialize")
-//    public ResponseEntity<String> initializeCache(@RequestParam int maxSize) {
-//        // Pass the maxSize from the request to the service
-//    	cacheService.initializeCache(maxSize);
-//
-//        return ResponseEntity.ok("Cache initialized with maxSize: " + maxSize);
-//    }
-    
-//    // This endpoint will be hit on first access
-//    @PostMapping("/setCacheSize")
-//    public ResponseEntity<String> setCacheSize(@RequestParam("size") int size) {
-//        if (size <= 0) {
-//            return ResponseEntity.badRequest().body("Cache size must be a positive number.");
-//        }
-//
-//        // Set the cache size in the service
-//        cacheService.setCacheSize(size);
-//        return ResponseEntity.ok("Cache size set to " + size);
-//    }
 
+    //method to add new entity
     @PostMapping("/add")
     public String addEntity(@RequestParam String Id,@RequestParam String firstName, @RequestParam String lastName) {
         try {
@@ -63,6 +44,7 @@ public class CacheController {
         }
     }
 
+   //method to get entity
     @GetMapping("/get/{id}")
     public PersonEntity getEntity(@PathVariable String id) {
         try {
@@ -73,6 +55,7 @@ public class CacheController {
         }
     }
 
+    //method to get all entities
     @GetMapping("/getAll")
     public List<PersonEntity> getAllEntities() {
         try {
@@ -83,6 +66,7 @@ public class CacheController {
         }
     }
     
+    //method to get all entities that are in cache
     @GetMapping("/getAllFromCache")
     public List<PersonEntity> getAllEntitiesFromCache() {
         try {
@@ -93,33 +77,39 @@ public class CacheController {
         }
     }
 
+    //method to remove an entity
     @DeleteMapping("/remove/{id}")
-    public void removeEntity(@PathVariable String id) {
+    public String removeEntity(@PathVariable String id) {
         try {
-            cacheService.remove(id);
+            String msg = cacheService.remove(id);
             logger.info("Successfully removed entity with ID: {}", id);
+            return msg;
         } catch (Exception e) {
             logger.error("Error removing entity with ID: {}", id, e);
             throw new RuntimeException("Error removing entity", e);
         }
     }
 
+    //method to remove all entities
     @DeleteMapping("/removeAll")
-    public void removeAllEntities() {
+    public String removeAllEntities() {
         try {
-            cacheService.removeAll();
+            String msg = cacheService.removeAll();
             logger.info("Successfully removed all entities.");
+            return msg;
         } catch (Exception e) {
             logger.error("Error removing all entities", e);
             throw new RuntimeException("Error removing all entities", e);
         }
     }
 
-    @PostMapping("/clear")
-    public void clearCache() {
+    //method to clear cache
+    @DeleteMapping("/clear")
+    public String clearCache() {
         try {
-            cacheService.clear();
+            String msg = cacheService.clear();
             logger.info("Successfully cleared cache.");
+            return msg;
         } catch (Exception e) {
             logger.error("Error clearing cache", e);
             throw new RuntimeException("Error clearing cache", e);
