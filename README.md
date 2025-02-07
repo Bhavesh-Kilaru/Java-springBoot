@@ -1,32 +1,44 @@
-### Description
-This application is designed to implement a Caching Service that stores the person entities. The person has following characteristics 
-ID
-FirstName
-LastName
+# Caching Service  
 
-This applications supports the below functionalities.
+## Description  
+This application implements a **Caching Service** that stores **Person** entities. Each **Person** entity has the following attributes:  
+- **ID**  
+- **First Name**  
+- **Last Name**  
 
-#### add
-This functionality takes a person which has all characteristics. Initially, it checks whether an person entity with id exists in cache and database. If it doesn't exists, it will insert the entity otherwise will show the appropriate message.
+The application provides various functionalities for managing cached entities efficiently.  
 
-#### Get Entity
-This functionality takes an input argument ID and returns the entity details if it exists in cache and Database.
+## Features  
 
-#### Get All Entities
-This functionality return all entities in cache and Database.
+### **Add Person**  
+- Accepts a **Person** entity with all attributes.  
+- Checks whether an entity with the given **ID** already exists in **cache** or **database**.  
+- If the entity **does not exist**, it inserts the new entity.  
+- If the entity **already exists**, an appropriate message is displayed.  
 
-### Get All Entities From cache
-This functionality return all entities in cache.
+### **Get Person by ID**  
+- Takes an **ID** as input.  
+- Returns the entity details if it exists in **cache** or **database**.  
 
-#### Remove Id
-This functionality takes an input argument ID and removes the entity if it exists in cache and Database.
+### **Get All Entities**  
+- Retrieves all **Person** entities stored in both **cache** and **database**.  
 
-#### Remove All
-This functionality removes all entities that exists in cache and Database.
+### **Get All Entities from Cache**  
+- Retrieves only the **Person** entities currently stored in the **cache**.  
 
-#### Clear
-This functionality removes all entities that exists in cache.
+### **Remove Person by ID**  
+- Takes an **ID** as input.  
+- Removes the entity from both **cache** and **database** if it exists.  
 
-__The Swagger is available in link :- swagger url : http://localhost:8080/swagger-ui/index.html#/ 
+### **Remove All Entities**  
+- Removes **all** entities stored in both **cache** and **database**.  
 
-Java version: 1.8__
+### **Clear Cache**  
+- Clears **all** entities stored in the **cache** without affecting the database.  
+
+## API Documentation  
+The Swagger API documentation is available at:  
+**[Swagger UI](http://localhost:8080/swagger-ui/index.html#/)**  
+
+## Environment Details  
+- **Java Version:** 1.8  
