@@ -1,6 +1,6 @@
 package com.demo.cachingservice;
 
-import com.demo.cachingservice.model.PersonEntity;
+import com.demo.cachingservice.model.Person;
 import com.demo.cachingservice.service.InMemoryCacheService;
 
 import java.io.ByteArrayInputStream;
@@ -57,7 +57,7 @@ class CachingserviceApplicationTests {
 		cacheService.add("3", "Jane", "Smith");
 		cacheService.add("4", "Miranda", "Bailey");
 
-		PersonEntity person = cacheService.get("3");
+		Person person = cacheService.get("3");
 		assertEquals("3", person.getId());
 
 	}
@@ -81,7 +81,7 @@ class CachingserviceApplicationTests {
 	@Order(4)
 	void testGetAllElement() {
 
-		List<PersonEntity> persons = cacheService.getAll();
+		List<Person> persons = cacheService.getAll();
 		System.out.println(persons.size());
 		assertEquals(4, persons.size());
 
@@ -92,7 +92,7 @@ class CachingserviceApplicationTests {
 	@Test
 	@Order(5)
 	void testGetAllElementFromcache() {
-		List<PersonEntity> persons = cacheService.getAllFromCache();
+		List<Person> persons = cacheService.getAllFromCache();
 		assertEquals(3, persons.size());
 	}
 
@@ -102,10 +102,10 @@ class CachingserviceApplicationTests {
 	@Order(6)
 	void testClearCache() {
 		cacheService.clear();
-		List<PersonEntity> persons_in_cache = cacheService.getAllFromCache();
+		List<Person> persons_in_cache = cacheService.getAllFromCache();
 		assertEquals(0, persons_in_cache.size());
 
-		List<PersonEntity> persons_after_cache_clearence = cacheService.getAll();
+		List<Person> persons_after_cache_clearence = cacheService.getAll();
 		assertEquals(1, persons_after_cache_clearence.size());
 	}
 
@@ -134,7 +134,7 @@ class CachingserviceApplicationTests {
 	void testDeleteAllElements() {
 
 		cacheService.removeAll();
-		List<PersonEntity> persons_after_deleting = cacheService.getAll();
+		List<Person> persons_after_deleting = cacheService.getAll();
 		assertEquals(0, persons_after_deleting.size());
 
 	}

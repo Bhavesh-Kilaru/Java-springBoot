@@ -10,30 +10,30 @@ The application provides various functionalities for managing cached entities ef
 
 ## Features  
 
-### **Add Person**  
+### **Add Person** (`POST /`)  
 - Accepts a **Person** entity with all attributes.  
 - Checks whether an entity with the given **ID** already exists in **cache** or **database**.  
 - If the entity **does not exist**, it inserts the new entity.  
 - If the entity **already exists**, an appropriate message is displayed.  
 
-### **Get Person by ID**  
+### **Get Person by ID** (`GET /{id}`)  
 - Takes an **ID** as input.  
 - Returns the entity details if it exists in **cache** or **database**.  
 
-### **Get All Entities**  
+### **Get All Entities** (`GET /`)  
 - Retrieves all **Person** entities stored in both **cache** and **database**.  
 
-### **Get All Entities from Cache**  
+### **Get All Entities from Cache** (`GET /cache/`)  
 - Retrieves only the **Person** entities currently stored in the **cache**.  
 
-### **Remove Person by ID**  
+### **Remove Person by ID** (`DELETE /{id}`)  
 - Takes an **ID** as input.  
 - Removes the entity from both **cache** and **database** if it exists.  
 
-### **Remove All Entities**  
+### **Remove All Entities** (`DELETE /`)  
 - Removes **all** entities stored in both **cache** and **database**.  
 
-### **Clear Cache**  
+### **Clear Cache** (`DELETE /cache/`)  
 - Clears **all** entities stored in the **cache** without affecting the database.  
 
 ## API Documentation  

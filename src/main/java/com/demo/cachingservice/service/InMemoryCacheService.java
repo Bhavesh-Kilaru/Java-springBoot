@@ -1,7 +1,7 @@
 package com.demo.cachingservice.service;
 
-import com.demo.cachingservice.model.PersonEntity;
-import com.demo.cachingservice.repository.PersonEntityRepository;
+import com.demo.cachingservice.model.Person;
+import com.demo.cachingservice.repository.PersonRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,14 +28,14 @@ public class InMemoryCacheService {
 	private final int maxSize;
 
 	// hash map to implement the Cache
-	private final Map<String, PersonEntity> cache;
+	private final Map<String, Person> cache;
 
 	// hash map to track the usage of elements
 	private final Map<String, AtomicInteger> usageCount;
 
 	// initializing the repository
 	@Autowired
-	private PersonEntityRepository repository;
+	private PersonRepository repository;
 
 	// default constructor
 	public InMemoryCacheService() {
@@ -64,12 +64,12 @@ public class InMemoryCacheService {
 				logger.info("Cache size exceeded. Evicting least-used entity.");
 				evictLeastUsed();
 			}
-			PersonEntity entity = new PersonEntity(id, firstName, lastName);
+			Person person = new Person(id, firstName, lastName);
 
 			// adding element to the Cache
-			cache.put(entity.getId(), entity);
-			usageCount.put(entity.getId(), new AtomicInteger(1));
-			logger.info("Added entity to cache: {}", entity.getId());
+			cache.put(id, person);
+			usageCount.put(id, new AtomicInteger(1));
+			logger.info("Added entity to cache: {}", person.getId());
 			return "Entity with id " + id + " inserted to cache";
 		} catch (Exception e) {
 			logger.error("Error inserting entity with ID: {}", id, e);
@@ -78,10 +78,10 @@ public class InMemoryCacheService {
 	}
 
 	// method to get an entity
-	public PersonEntity get(String id) {
+	public Person get(String id) {
 		try {
 			// checking for entity in cache
-			PersonEntity entity = cache.get(id);
+			Person entity = cache.get(id);
 
 			// checking for entity in database if not found in cache
 			if (entity == null) {
@@ -120,13 +120,13 @@ public class InMemoryCacheService {
 	}
 
 	// method to list all entities
-	public List<PersonEntity> getAll() {
+	public List<Person> getAll() {
 		try {
 			// Retrieve entries from the cache
-			List<PersonEntity> allEntities = new ArrayList<>(cache.values());
+			List<Person> allEntities = new ArrayList<>(cache.values());
 
 			// Retrieve entries from the repository
-			List<PersonEntity> repositoryEntities = repository.findAll();
+			List<Person> repositoryEntities = repository.findAll();
 
 			// adding the entities from repository
 			allEntities.addAll(repositoryEntities.stream()
@@ -142,9 +142,9 @@ public class InMemoryCacheService {
 	}
 
 	// method to list all entities from cache
-	public List<PersonEntity> getAllFromCache() {
+	public List<Person> getAllFromCache() {
 		try {
-			List<PersonEntity> allEntities = new ArrayList<>(cache.values());
+			List<Person> allEntities = new ArrayList<>(cache.values());
 
 			logger.info("Retrieved all entities from cache. Total: {}", allEntities.size());
 			return allEntities;
@@ -157,7 +157,7 @@ public class InMemoryCacheService {
 	// removing entity from cache or database
 	public synchronized String remove(String id) {
 		try {
-			PersonEntity removed_id = cache.remove(id);
+			Person removed_id = cache.remove(id);
 
 			// checking in database
 			if (removed_id == null) {
@@ -218,13 +218,13 @@ public class InMemoryCacheService {
 
 			// removing from cache
 			if (leastUsedId != null) {
-				PersonEntity evictedEntity = cache.remove(leastUsedId);
+				Person evictedPerson = cache.remove(leastUsedId);
 				usageCount.remove(leastUsedId);
 				logger.info("removed entity with id {} from cache", leastUsedId);
 
 				// inserting to database
-				if (evictedEntity != null) {
-					repository.save(evictedEntity);
+				if (evictedPerson != null) {
+					repository.save(evictedPerson);
 					logger.info("Evicted least-used entity with ID: {} from cache and inserted in database",
 							leastUsedId);
 				}
@@ -245,7 +245,7 @@ public class InMemoryCacheService {
 	public boolean checkIfIdExists(String id) {
 		try {
 			// checking for entity in cache
-			PersonEntity entity = cache.get(id);
+			Person entity = cache.get(id);
 
 			// checking for entity in database if not found in cache
 			if (entity == null) {
