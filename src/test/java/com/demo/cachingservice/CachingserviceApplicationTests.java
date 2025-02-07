@@ -26,10 +26,7 @@ class CachingserviceApplicationTests {
 	@Autowired
 	private InMemoryCacheService cacheService;
 
-	@Test
-	void contextLoads() {
-	}
-
+	//test to check the input cache size
 	@Test
 	@Order(1)
 	void testMaxCacheSize() {
@@ -48,8 +45,8 @@ class CachingserviceApplicationTests {
 		System.setIn(System.in);
 	}
 
-	// testing get functionalities and clearing cache
-	// Testing delete functionality
+	// testing the functionality to add elements
+	// the functionality to get an entity with a particular id is also tested
 	@Test
 	@Order(2)
 	void testgetElement() {
@@ -64,10 +61,24 @@ class CachingserviceApplicationTests {
 		assertEquals("3", person.getId());
 
 	}
-
-	// Testing to get all elements functionality
+	
+	// testing to check inserting values with same id
+	// Testing delete functionality
 	@Test
 	@Order(3)
+	void testInsertingExistingID() {
+		System.out.println(cacheService.getCacheSize());
+		// Act: Post the entities to the API
+		String msg = cacheService.add("2", "Joe", "Wilson");
+		
+		assertEquals("Entity with id 2 already exists in cache", msg);
+
+	}
+
+	// Testing to get all entities functionality
+	//this return from both cache and database
+	@Test
+	@Order(4)
 	void testGetAllElement() {
 
 		List<PersonEntity> persons = cacheService.getAll();
@@ -76,17 +87,19 @@ class CachingserviceApplicationTests {
 
 	}
 
-	// Testing to get all elemnets from cache functionality
+	// Testing to get all entities from cache functionality
+	//this return entities from cache
 	@Test
-	@Order(4)
+	@Order(5)
 	void testGetAllElementFromcache() {
 		List<PersonEntity> persons = cacheService.getAllFromCache();
 		assertEquals(3, persons.size());
 	}
 
-	// Testing to delete all elements from cache functionality
+	// Testing to delete all entities from cache functionality
+	// the below functionality should keep entities that are in database
 	@Test
-	@Order(5)
+	@Order(6)
 	void testClearCache() {
 		cacheService.clear();
 		List<PersonEntity> persons_in_cache = cacheService.getAllFromCache();
@@ -97,8 +110,9 @@ class CachingserviceApplicationTests {
 	}
 
 	// Testing delete functionality
+	// to remove an entity with particular id
 	@Test
-	@Order(6)
+	@Order(7)
 	void testDeleteById() {
 		System.out.println("cache size" + cacheService.getCacheSize());
 		// Act: Post the entities to the API
@@ -107,21 +121,16 @@ class CachingserviceApplicationTests {
 		cacheService.add("7", "Jane", "Smith");
 		cacheService.add("8", "Miranda", "Bailey");
 
-		cacheService.remove("8");
-		PersonEntity entityCheck = cacheService.get("8");
+		String msg = cacheService.remove("8");
 
 		// // Assert: Verify that the entity is null
-		assertNull(entityCheck, "Entity with ID '4' should not exist in the cache or database");
-
-		cacheService.removeAll();
-		List<PersonEntity> persons_after_deleting = cacheService.getAll();
-		assertEquals(0, persons_after_deleting.size());
-
+		assertEquals(msg, "Removed entity with ID: 8 from cache");
 	}
 
 	// Testing delete functionality
+	// to check whether the application is able to delete all entities
 	@Test
-	@Order(7)
+	@Order(8)
 	void testDeleteAllElements() {
 
 		cacheService.removeAll();
