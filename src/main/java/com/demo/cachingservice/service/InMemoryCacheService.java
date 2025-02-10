@@ -163,10 +163,16 @@ public class InMemoryCacheService {
 			if (removed_id == null) {
 				logger.info("Entity with id {} not found in cache. Checking in Datbase", id);
 				try {
+					if(repository.existsById(id)) {
 					repository.deleteById(id);
 					usageCount.remove(id);
 					logger.info("Removed entity with ID: {} from database", id);
 					return "entity with ID: " + id + " deleted from database";
+					}
+					else {
+						logger.warn("Entity with ID: {} not found in database", id);
+					    return "Entity with ID: " + id + " not found in cache and database";
+					}
 				} catch (Exception e) {
 					logger.info("Entity with ID: {} doesnt found in cache and database", id);
 					return "entity with ID: " + id + " not found in cache and database";

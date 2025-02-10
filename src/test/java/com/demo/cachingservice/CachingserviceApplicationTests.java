@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.springframework.test.context.TestPropertySource;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -63,7 +65,6 @@ class CachingserviceApplicationTests {
 	}
 	
 	// testing to check inserting values with same id
-	// Testing delete functionality
 	@Test
 	@Order(3)
 	void testInsertingExistingID() {
@@ -104,6 +105,12 @@ class CachingserviceApplicationTests {
 		cacheService.clear();
 		List<Person> persons_in_cache = cacheService.getAllFromCache();
 		assertEquals(0, persons_in_cache.size());
+	}
+	
+	// testing the existence of database after deleting entire cache
+	@Test
+	@Order(7)
+	void testEntityIndataBase() {
 
 		List<Person> persons_after_cache_clearence = cacheService.getAll();
 		assertEquals(1, persons_after_cache_clearence.size());
@@ -112,7 +119,7 @@ class CachingserviceApplicationTests {
 	// Testing delete functionality
 	// to remove an entity with particular id
 	@Test
-	@Order(7)
+	@Order(8)
 	void testDeleteById() {
 		System.out.println("cache size" + cacheService.getCacheSize());
 		// Act: Post the entities to the API
@@ -130,7 +137,7 @@ class CachingserviceApplicationTests {
 	// Testing delete functionality
 	// to check whether the application is able to delete all entities
 	@Test
-	@Order(8)
+	@Order(9)
 	void testDeleteAllElements() {
 
 		cacheService.removeAll();
@@ -138,4 +145,97 @@ class CachingserviceApplicationTests {
 		assertEquals(0, persons_after_deleting.size());
 
 	}
+	
+	@Test
+	@Order(10)
+	void testCacheSizeLimit() {
+	    // Act: Add more elements than the cache size
+	    cacheService.add("9", "Tom", "Hanks");
+	    cacheService.add("10", "Emma", "Watson");
+	    cacheService.add("11", "Robert", "Downey Jr.");
+	    cacheService.add("12", "Scarlett", "Johansson");
+
+	    // Assert: Check the cache size does not exceed the limit
+	    assertEquals(3, cacheService.getAllFromCache().size());  // Assuming FIFO/LRU eviction
+	}
+	
+	@Test
+	@Order(11)
+	void testCacheEviction() {
+	    // Act: Add elements to fill the cache
+	    cacheService.add("13", "Chris", "Evans");
+	    cacheService.add("14", "Mark", "Ruffalo");
+	    cacheService.add("15", "Jeremy", "Renner");
+
+	    // Add one more element to exceed the cache size
+	    cacheService.add("16", "Paul", "Rudd");
+
+	    // Assert: Check if the oldest item (id "13") is evicted
+	    // Assert: Check if the first element is moved to the database
+	    List<Person> persons_in_cache = cacheService.getAllFromCache();
+	    assertTrue(persons_in_cache.stream().noneMatch(person -> person.getId().equals("13")));
+
+	    Person remainingPerson = cacheService.get("14");
+	    assertNotNull(remainingPerson);  // "14" should still exist in the cache
+	}
+	
+	@Test
+	@Order(12)
+	void testGetNonExistentEntity() {
+	    // Attempt to retrieve an entity that doesn't exist
+	    Person person = cacheService.get("99");
+	    assertNull(person);  // Should return null if the entity is not found in the cache
+	}
+	
+	@Test
+	@Order(13)
+	void testAddingAndRetrievingMultipleEntities() {
+	    // Add multiple entities
+	    cacheService.add("17", "Chris", "Hemsworth");
+	    cacheService.add("18", "Natalie", "Portman");
+
+	    // Retrieve each entity
+	    Person person1 = cacheService.get("17");
+	    assertEquals("Chris", person1.getFirstName());
+
+	    Person person2 = cacheService.get("18");
+	    assertEquals("Natalie", person2.getFirstName());
+	}
+	
+	// to check whether database is persistent
+	@Test
+	@Order(14)
+	void testCacheEvictionAndDatabaseUpdate() {
+		cacheService.removeAll();
+		
+	    // Act: Add 4 elements to the cache
+	    cacheService.add("1", "John", "Doe");
+	    cacheService.add("2", "Alice", "Johnson");
+	    cacheService.add("3", "Jane", "Smith");
+	    cacheService.add("4", "Miranda", "Bailey"); // Adding the 4th element should trigger eviction of the first element
+
+	    // Assert: Check if the first element is moved to the database
+	    List<Person> persons_in_cache = cacheService.getAllFromCache();
+	    assertTrue(persons_in_cache.stream().noneMatch(person -> person.getId().equals("1")));  // ID "1" should no longer be in cache
+	    
+	    //fetching the element from database
+	    cacheService.get("1"); 
+
+	    // Act: Clear the cache
+	    cacheService.clear();
+
+	    // Assert: After clearing the cache, the database should contain the last two evicted entities
+	    List<Person> persons_in_db = cacheService.getAll();  // This should return the two entities in the database
+	    assertEquals(2, persons_in_db.size());  // There should be 2 entities in the database (id 2 and id 1)
+	}
+	
+	// checking for an irrelevant element
+	@Test
+	@Order(15)
+	void testRemoveNonExistentEntity() {
+	    // Try removing an entity that doesn't exist
+	    String msg = cacheService.remove("100");
+	    assertEquals("Entity with ID: 100 not found in cache and database", msg);
+	}
+
 }
