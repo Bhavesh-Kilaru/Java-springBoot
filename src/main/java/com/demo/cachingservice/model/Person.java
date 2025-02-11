@@ -6,20 +6,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class PersonEntity{
+public class Person{
 		@Id
 	 	private final String id;
 	    private final String firstName;
 	    private final String lastName;
 	    
 	 // Default constructor
-	    public PersonEntity() {
+	    public Person() {
 	    	this.id = null;
 	    	this.firstName = "";
 			this.lastName = "";
 	    }
 
-	    public PersonEntity(String id, String firstName, String lastName) {
+	    public Person(String id, String firstName, String lastName) {
 	        this.id = id;
 	        this.firstName = firstName;
 	        this.lastName = lastName;
