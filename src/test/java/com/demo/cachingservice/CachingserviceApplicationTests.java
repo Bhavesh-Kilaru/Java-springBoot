@@ -229,9 +229,21 @@ class CachingserviceApplicationTests {
 	    assertEquals(2, persons_in_db.size());  // There should be 2 entities in the database (id 2 and id 1)
 	}
 	
-	// checking for an irrelevant element
+	// checking whether the element is moved from database to Cache
 	@Test
 	@Order(15)
+	void checkEntityInCache() {
+		//fetching the element from database
+	    cacheService.get("1"); 
+	    
+	    List<Person> persons_in_cache = cacheService.getAll(); 
+	    boolean existsInCache = persons_in_cache.stream().anyMatch(person -> person.getId().equals("1"));
+	    assertTrue(existsInCache, "Entity with ID 1 should now be in the cache");
+	}
+	
+	// checking for an irrelevant element
+	@Test
+	@Order(16)
 	void testRemoveNonExistentEntity() {
 	    // Try removing an entity that doesn't exist
 	    String msg = cacheService.remove("100");
